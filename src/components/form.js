@@ -24,7 +24,7 @@ const FormBox = styled.div`
 `;
 
 const Warning = styled.div`
-    display: ${({inputValid}) => inputValid ? "none" : "flex"};
+    display: ${({showWarning}) => showWarning ? "flex" : "none"};
     & > p {
         color: red;
     }
@@ -55,6 +55,7 @@ export default function Form (){
     const changeCalculation = useChangeCalculationContext();
 
     useEffect(() => {
+        console.log("Bruh")
         calculateBMI();
     }, [height, weight])
 
@@ -66,10 +67,10 @@ export default function Form (){
 
     function checkIfNatural (number){
         if (number === "initial value"){
-            return "yes"
+            return "initial value"
         }
-
-        if (isNaN(number)){
+        if (parseFloat(number) === NaN){
+            console.log(parseFloat(number))
             return "not a number";
         }
 
@@ -89,13 +90,27 @@ export default function Form (){
     }
 
     function calculateBMI (){
+        // console.log(checkInputValidity());
         if (checkInputValidity()){
             let newBMI = height/(weight**2)
             if (!isMetric){
                 newBMI = newBMI * 703;
             }
+            console.log(newBMI);
             changeCalculation(newBMI);
         }
+    }
+
+    function showWarning (){
+        if(checkIfNatural(height) !== "yes" && checkIfNatural(height) !== "initial value"){
+            return true;
+        }
+        
+        if(checkIfNatural(weight) !== "yes" && checkIfNatural(weight) !== "initial value"){
+            return true;
+        }
+
+        return false;
     }
 
     function warningText (){
@@ -105,13 +120,13 @@ export default function Form (){
     return (
         <Main>
             <FormBox>
-                <FormInput isMetric={isMetric} whatData="Weight" />
-                <FormInput isMetric={isMetric} whatData="Height" />
+                <FormInput isMetric={isMetric} whatData="Weight" setExternalValue={setWeight} />
+                <FormInput isMetric={isMetric} whatData="Height" setExternalValue={setHeight} />
                 <MetricChoiceContainer>
                     <MetricChoice chosen={isMetric ? true : false} onClick={() => handleMetricChoiceClick(true)}>Metric</MetricChoice>
                     <MetricChoice chosen={!isMetric ? true : false}onClick={() => handleMetricChoiceClick(false)}>Imperial</MetricChoice>
                 </MetricChoiceContainer>
-                <Warning inputValid={checkInputValidity()}>
+                <Warning showWarning={showWarning()}>
                     <p>{warningText()}</p>
                 </Warning>
             </FormBox>
