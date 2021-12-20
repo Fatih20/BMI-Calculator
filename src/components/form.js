@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 
 import { VanillaButton } from "../GlobalComponent";
@@ -24,7 +24,7 @@ const FormBox = styled.div`
 `;
 
 const Warning = styled.div`
-    display: ${({inputInvalid}) => inputInvalid ? "flex" : "none"};
+    display: ${({inputValid}) => inputValid ? "none" : "flex"};
     & > p {
         color: red;
     }
@@ -47,12 +47,16 @@ const MetricChoice = styled(VanillaButton)`
 
 export default function Form (){
     const[isMetric, setIsMetric] = useState(true);
-    const[heightValidity, setHeightValidity] = useState("");
-    const[weightValidity, setWeightValidity] = useState("");
     const[invalidInput, setInvalidInput] = useState(null);
+    const[height, setHeight] = useState("initial value");
+    const[weight, setWeight] = useState("initial value");
 
     const calculation = useCalculationContext();
     const changeCalculation = useChangeCalculationContext();
+
+    useEffect(() => {
+        calculateBMI();
+    }, [height, weight])
 
     function handleMetricChoiceClick (clickedMetric){
         if (clickedMetric !== isMetric){
@@ -61,6 +65,10 @@ export default function Form (){
     }
 
     function checkIfNatural (number){
+        if (number === "initial value"){
+            return "yes"
+        }
+
         if (isNaN(number)){
             return "not a number";
         }
@@ -72,9 +80,7 @@ export default function Form (){
         return "yes";
     }
 
-    function checkInputValidity (height, weight) {
-        setHeightValidity(checkIfNatural(height));
-        setWeightValidity(checkIfNatural(weight));
+    function checkInputValidity () {
         if (checkIfNatural(height) === "yes" && checkIfNatural(weight) === "yes"){
             return true;
         } else {
@@ -82,21 +88,13 @@ export default function Form (){
         }
     }
 
-    function calculateBMI (height, weight){
-        if (checkInputValidity(height, weight)){
+    function calculateBMI (){
+        if (checkInputValidity()){
             let newBMI = height/(weight**2)
             if (!isMetric){
                 newBMI = newBMI * 703;
             }
             changeCalculation(newBMI);
-        }
-    }
-
-    function isCurrentInputInvalid (){
-        if ((heightValidity !== "yes" && heightValidity !== "") || (weightValidity !== "yes" && weightValidity !== "")) {
-            return true;  
-        } else {
-            return false;
         }
     }
 
@@ -113,7 +111,7 @@ export default function Form (){
                     <MetricChoice chosen={isMetric ? true : false} onClick={() => handleMetricChoiceClick(true)}>Metric</MetricChoice>
                     <MetricChoice chosen={!isMetric ? true : false}onClick={() => handleMetricChoiceClick(false)}>Imperial</MetricChoice>
                 </MetricChoiceContainer>
-                <Warning inputInvalid={isCurrentInputInvalid()}>
+                <Warning inputValid={checkInputValidity()}>
                     <p>{warningText()}</p>
                 </Warning>
             </FormBox>
