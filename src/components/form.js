@@ -38,6 +38,7 @@ const MetricChoiceContainer = styled.div`
 `;
 
 const MetricChoice = styled(VanillaButton)`
+    align-self: center;
     background-color: rgba(0, 0, 0, 0);
     color: ${({chosen}) => chosen ? "white" : "rgba(255, 255, 255, 0.4)"};
     border-radius: 5px; 
@@ -91,6 +92,14 @@ export default function Form (){
         }
     }
 
+    function isCurrentInputInvalid (){
+        if ((heightValidity !== "yes" && heightValidity !== "") || (weightValidity !== "yes" && weightValidity !== "")) {
+            return true;  
+        } else {
+            return false;
+        }
+    }
+
     function warningText (){
         return ""
     }
@@ -104,7 +113,7 @@ export default function Form (){
                     <MetricChoice chosen={isMetric ? true : false} onClick={() => handleMetricChoiceClick(true)}>Metric</MetricChoice>
                     <MetricChoice chosen={!isMetric ? true : false}onClick={() => handleMetricChoiceClick(false)}>Imperial</MetricChoice>
                 </MetricChoiceContainer>
-                <Warning inputInvalid={heightValidity !== "yes" || weightValidity !== "yes" ? true : false}>
+                <Warning inputInvalid={isCurrentInputInvalid()}>
                     <p>{warningText()}</p>
                 </Warning>
             </FormBox>
