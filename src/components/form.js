@@ -92,7 +92,7 @@ export default function Form (){
     function calculateBMI (){
         // console.log(checkInputValidity());
         if (checkInputValidity()){
-            let newBMI = height/(weight**2)
+            let newBMI = weight/((height/100)**2)
             if (!isMetric){
                 newBMI = newBMI * 703;
             }
